@@ -36,3 +36,18 @@
     transform: rotate(360deg);
   }
 }
+
+
+/*Scroll Barr*/
+.container::-webkit-scrollbar{
+  width: 0.5em;
+}
+.container::-webkit-scrollbar-track{
+  background: transparent;
+}
+.container::-webkit-scrollbar-thumb{
+ background-color: transparent;
+}
+.container{
+  scrollbar-width: none;
+}
