@@ -130,7 +130,7 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ isOpen, onClose }) => {
                                         sx={{
                                             marginBottom: '10px',
                                             height: '40vh',
-                                            width: '15vw',
+                                            width: '10vw',
                                             margin: '10px',
                                         }}>
                                         
