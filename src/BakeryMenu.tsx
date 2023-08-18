@@ -174,7 +174,7 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ items, isOpen, onClose, setCart
                                     <Grid container>
                                     {categoryData.items.map((item: any) => ( item.disponible == "false" ? null : (
                                         <Grid item xs={2.4}>
-                                            <BreadCard bread={item} onClick={handleCardClick} />
+                                            <BreadCard bread={item} seleccionado={true} onClick={handleCardClick} />
                                         </Grid>
                                     )
                                     ))}

@@ -14,6 +14,7 @@ interface Bread {
 
 interface BreadCardProps {
     bread : Bread;
+    seleccionado : boolean;
     onClick : (bread : Bread) => void;
 }
 
