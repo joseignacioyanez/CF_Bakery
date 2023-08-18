@@ -4,9 +4,28 @@ import BakeryMenu from './BakeryMenu';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'// Revisar
 
-function App() {
+interface Bread {
+  disponible: boolean;
+  codigo: string;
+  nombre: string;
+  url: string;
+  precioAfiliado?: number;
+  precioNoAfiliado?: number;
+}
+
+interface CartItem{
+  bread: Bread;
+  quantity : number;
+}
+
+interface AppProps {
+  cart?: CartItem[]
+}
+
+const App : React.FC<AppProps> = () =>{
 
   const [bakeryOpen, setBakeryOpen] = useState(false);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   const openBakery = () => {
     setBakeryOpen(true);
@@ -16,13 +35,9 @@ function App() {
     setBakeryOpen(false);
   } 
 
-  useEffect(() => {
-    //PETICION AL SERVICIO PARA CARGAR LOS PANES
-    //CUANDO SE ABRA EL MODAL
-  
-
-
-}, [bakeryOpen])
+  const cleanCart = () =>{
+    setCart([]);
+  }
 
   // Style
   const styleBoton ={
@@ -41,7 +56,14 @@ function App() {
         Abrir Panadería
       </Button>
 
-      <BakeryMenu isOpen={bakeryOpen} onClose={closeBakery} />
+      <Button variant="contained" color='error' onClick={cleanCart} sx={styleBoton} style={{top:'60%'}}>
+        Limpiar Carro
+      </Button>
+
+      <pre>
+      {JSON.stringify(cart, undefined, 2)}
+      </pre>
+      <BakeryMenu items={cart} isOpen={bakeryOpen} onClose={closeBakery} setCart={setCart} />
     </div>
   );
 }
