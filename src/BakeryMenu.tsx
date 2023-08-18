@@ -1,3 +1,4 @@
+import { BreadCard } from './BreadCard';
 import React,  { useEffect, useState } from 'react';
 import { Dialog, Toolbar, AppBar, Button, Typography, DialogContent, Grid, Tabs, Tab, Box, Card, CardMedia, CardContent }  from '@mui/material';
 import { TabContext, TabList } from '@mui/lab';
@@ -20,28 +21,29 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-          try {
-            const response = await fetch('http://10.80.4.172:8081/scopay/webresources/catalogoPan', {
-              method: 'POST',
-              headers: {
+            try {
+            const response = await fetch('https://catalogopan.free.beeceptor.com/todos', {
+            //const response = await fetch('http://10.80.4.172:8081/scopay/webresources/catalogoPan', {
+                method: 'POST',
+                headers: {
                 'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ idLocal: '110' })
+            },
+                body: JSON.stringify({ idLocal: '110' })
             });
     
             if (response.ok) {
-              const responseData = await response.json();
-              setDataCatalogoPan(responseData.data);
+                const responseData = await response.json();
+                setDataCatalogoPan(responseData.data);
             } else {
-              console.error('Error en la solicitud:', response.status);
+                console.error('Error en la solicitud:', response.status);
             }
-          } catch (error) {
+            } catch (error) {
             console.error('Error:', error);
-          }
+            }
         };
     
         fetchData();
-      }, []);
+    }, []);
 
     if (!isOpen) {
         return null;
@@ -64,7 +66,7 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ isOpen, onClose }) => {
                     backgroundPosition: 'center',
                     overflow:'hidden'
                 },
-              }}
+            }}
             >
                 
                 
@@ -108,47 +110,26 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ isOpen, onClose }) => {
                                 className = 'container'
                                 sx={{ 
                                 typography: 'body1', 
-                                width: '95vw',
+                                width: '100vw',
                                 height: '82vh', 
                                 backgroundColor: 'rgba(255, 255, 255, 0.85)', 
                                 borderRadius: '20px', 
                                 padding: '20px', 
-                                margin: '18px',
+                                margin: '10px',
                                 boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', 
                                 display: category === (categoryData.codigo-1) ? 'flex' : 'none', 
-                                flexDirection:'row',
-                                
-                                flexWrap:'wrap',
                                 overflow:'auto',
                                 justifyContent: 'space-around'
                             }}
                             >
-                            
+                                <Grid container>
                                 {categoryData.items.map((item: any) => ( item.disponible == "false" ? null : (
-                                    <Card 
-                                        key={item.codigoItem} 
-                                        sx={{
-                                            marginBottom: '10px',
-                                            height: '40vh',
-                                            width: '10vw',
-                                            margin: '10px',
-                                        }}>
-                                        
-                                        <CardMedia
-                                            component="img"
-                                            alt={correctFormat(item.nombre)}
-                                            height="140"
-                                            image={item.url.replace('linuxlocal', '10.80.4.172')}
-                                        />
-                                        <CardContent>
-                                            <Typography variant="h6" component="div">
-                                                {correctFormat(item.nombre)}
-                                            </Typography>
-                                            {/* Otros detalles del ítem */}
-                                        </CardContent>
-                                    </Card>
+                                    <Grid item xs={2.4}>
+                                        <BreadCard {...item} />
+                                    </Grid>
                                 )
                                 ))}
+                                </Grid>
                             </Box>
                             
                             </TabPanel>
@@ -159,7 +140,7 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ isOpen, onClose }) => {
                     </Box>
                 </TabContext>    
             </Dialog>
-      );
+        );
 
 }
 
@@ -175,36 +156,6 @@ function TabPanel(props: { children: any; value: number; index: number; })
             }
         </div>
     )
-}
-
-function correctString(jsonString: string): string {
-    // Parse the JSON string to an object
-    let jsonObject;
-    try {
-        jsonObject = JSON.parse(jsonString);
-    } catch (error) {
-        console.error("Invalid JSON input:", error);
-        return jsonString; // Return the original string if JSON parsing fails
-    }
-    
-    // Iterate through the object's properties and correct the values
-    for (const key in jsonObject) {
-        if (typeof jsonObject[key] === "string") {
-            jsonObject[key] = correctFormat(jsonObject[key]);
-        }
-    }
-    
-    // Convert the corrected object back to JSON and return
-    return JSON.stringify(jsonObject);
-}
-
-function correctFormat(input: string): string {
-    // Replace special characters and capitalize words
-    const corrected = input
-        .replace(/[^A-Za-záéíóúüÁÉÍÓÚÜñÑ\s]/g, "") // Remove non-alphabetic characters except spaces
-        .replace(/\w+/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()); // Capitalize words
-    
-    return corrected;
 }
 
 export default BakeryMenu;

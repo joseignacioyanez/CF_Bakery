@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal } from '@mui/material';
 import BakeryMenu from './BakeryMenu'; 
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css'// Revisar
 
 function App() {
 
