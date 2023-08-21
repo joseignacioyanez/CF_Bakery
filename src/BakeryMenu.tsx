@@ -7,7 +7,7 @@ import QuantityModal from './QuantityModal';
 
 
 interface Bread {
-    disponible: boolean;
+    disponible: string;
     codigoItem: string;
     nombre: string;
     url: string;
@@ -30,12 +30,13 @@ interface CartItem{
 interface BakeryMenuProps {
     previousItems: CartItem[],
     isOpen: boolean;
+    isAffiliated : boolean;
     onClose: () => void;
     setCart: (items : CartItem[])=> void;
 }
 
 
-const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose, setCart }) => {
+const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose, setCart, isAffiliated }) => {
     
     const [category, setCategory] = useState(0);
     const [selectedItem, setSelectedItem] = useState<Bread | null>(null);
@@ -95,8 +96,8 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose,
         const fetchData = async () => {
             try {
             // API de TEST
-            const response = await fetch('https://ec11055f-9910-4d14-a8ed-66882912848b.mock.pstmn.io/todos', {
-            //const response = await fetch('http://10.80.4.172:8081/scopay/webresources/catalogoPan', {
+            //const response = await fetch('https://ec11055f-9910-4d14-a8ed-66882912848b.mock.pstmn.io/todos', {
+            const response = await fetch('http://10.80.4.172:8081/scopay/webresources/catalogoPan', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'
@@ -112,7 +113,7 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose,
                     descripcion : category.descripcion,
                     items: category.items.map((item: Bread) => ({
                         ...item,
-                        isSelected: false
+                        isSelected: false,
                     }))
                 }))
                 setDataCatalogoPan(responseDataWithInterfaceBread);
@@ -128,6 +129,7 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose,
         fetchData();
 
     }, []);
+
 
     // Para que se dispare con el boton de App.tsx
     if (!isOpen) {
@@ -162,9 +164,14 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose,
                             <Toolbar>
                                 <Box sx={{ width: '70vw' }}>
                                     <TabList value={category} onChange={handleCategoryChange} variant="scrollable" scrollButtons='auto'>
-                                        {dataCatalogoPan.map((categoryData: any) => ( 
-                                            <Tab label={categoryData.descripcion} />
-                                        ))}
+                                    {dataCatalogoPan.map((categoryData: Category) => {
+                                    const hasEnabledBread = categoryData.items.some((bread) => bread.disponible != 'false' ? true : false);
+                                    console.log(categoryData)
+                                    console.log("cat: " + categoryData.descripcion + " dispo: " + hasEnabledBread)
+                                    return hasEnabledBread ? (
+                                        <Tab label={categoryData.descripcion} key={categoryData.codigo} />
+                                    ) : null;
+                                    })}
                                     </TabList>
                                 </Box>
                                     <Button autoFocus color="info" onClick={handleBakeryClose} style={{ position: 'absolute', top: '20%', right: '0%'}}>
@@ -197,15 +204,20 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose,
                                     padding: '10px', 
                                     margin: '10px',
                                     boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', 
-                                    display: category === (categoryData.codigo-1) ? 'flex' : 'none', 
-                                    overflow:'auto',
-                                    justifyContent: 'space-around'
+                                    overflow:'hidden'
                                     }}
                                 >
                                     <Grid container>
                                     {categoryData.items.map((item: any) => ( item.disponible == "false" ? null : (
-                                        <Grid item xs={2.4}>
-                                            <BreadCard bread={item} isSelected={item.isSelected} onClick={handleCardClick} />
+                                        <Grid item xs={1.5}>
+                                            <BreadCard bread={item} isSelected={item.isSelected} onClick={handleCardClick} quantity={
+                                                                                                                                        cartItems.reduce((accumulator, cartItem) => {
+                                                                                                                                        if (cartItem.bread.codigoItem === item.codigoItem) {
+                                                                                                                                            return accumulator + (cartItem.quantity ?? 0);
+                                                                                                                                        }
+                                                                                                                                        return accumulator;
+                                                                                                                                        }, 0) || 1
+                                                                                                                                    } isAffiliated={isAffiliated}/>
                                         </Grid>
                                     )
                                     ))}

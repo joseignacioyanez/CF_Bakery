@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 interface Bread {
-    disponible: boolean;
+    disponible: string;
     codigoItem: string;
     nombre: string;
     url: string;
@@ -19,6 +19,10 @@ interface QuantityModalProps {
   open: boolean;
   onClose: () => void;
   onConfirm: (item: Bread, quantity: number) => void;
+}
+
+const formatPrice = (number: number) => {
+  return (Math.round(number * 100) / 100).toFixed(2)
 }
 
 const QuantityModal: React.FC<QuantityModalProps> = ({ item, open, onClose, onConfirm }) => {
@@ -75,6 +79,7 @@ const QuantityModal: React.FC<QuantityModalProps> = ({ item, open, onClose, onCo
             >
                 < RemoveIcon sx={{fontSize:30}}/>
             </Button>
+            {/*Cantidad*/}
             <Typography
             sx={{
                 fontSize:'2rem',
@@ -90,6 +95,13 @@ const QuantityModal: React.FC<QuantityModalProps> = ({ item, open, onClose, onCo
             </Button>
         </Container>
         
+        {/*Precio*/}
+        <Typography
+            sx={{
+                fontSize:'1.5rem',
+                color: 'gray'
+            }}>{'Total: $ ' + formatPrice(quantity*0.1) }</Typography>
+
         <Container 
         style={{
             display:'flex',

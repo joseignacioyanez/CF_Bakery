@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'// Revisar
 
 // Clases para enviar y recibir items para el carrito
 interface Bread {
-  disponible: boolean;
+  disponible: string;
   codigoItem: string;
   nombre: string;
   url: string;
@@ -28,6 +28,7 @@ const App : React.FC<AppProps> = () =>{
 
   const [bakeryOpen, setBakeryOpen] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const isAffiliated = true;
 
   const openBakery = () => {
     setBakeryOpen(true);
@@ -65,7 +66,7 @@ const App : React.FC<AppProps> = () =>{
       {JSON.stringify(cart, undefined, 2)}
       </pre>
 
-      <BakeryMenu previousItems={cart} isOpen={bakeryOpen} onClose={closeBakery} setCart={setCart} />
+      <BakeryMenu previousItems={cart} isOpen={bakeryOpen} onClose={closeBakery} setCart={setCart} isAffiliated={isAffiliated} />
     </div>
   );
 }
