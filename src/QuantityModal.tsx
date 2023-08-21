@@ -1,16 +1,17 @@
-import React, { useState, useRef } from 'react';
-import { Modal, Button, Typography, TextField, Dialog, Hidden } from '@mui/material';
+import React, { useState } from 'react';
+import { Button, Typography, Dialog } from '@mui/material';
 import { Container } from 'react-bootstrap';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 interface Bread {
     disponible: boolean;
-    codigo: string;
+    codigoItem: string;
     nombre: string;
     url: string;
     precioAfiliado?: number;
     precioNoAfiliado?: number;
+    isSelected: boolean;
 }
 
 interface QuantityModalProps {

@@ -1,16 +1,25 @@
 import { BreadCard } from './BreadCard';
 import React,  { useEffect, useState } from 'react';
-import { Dialog, Toolbar, AppBar, Button, Grid, Tabs, Tab, Box, Card, CardMedia, CardContent }  from '@mui/material';
+import { Dialog, Toolbar, AppBar, Button, Grid, Tab, Box}  from '@mui/material';
 import { TabContext, TabList } from '@mui/lab';
 import QuantityModal from './QuantityModal';
 
+
+
 interface Bread {
     disponible: boolean;
-    codigo: string;
+    codigoItem: string;
     nombre: string;
     url: string;
     precioAfiliado?: number;
     precioNoAfiliado?: number;
+    isSelected: boolean;
+}
+
+interface Category {
+    codigo: number;
+    descripcion : string;
+    items : Bread[];
 }
 
 interface CartItem{
@@ -19,14 +28,14 @@ interface CartItem{
 }
 
 interface BakeryMenuProps {
-    items: CartItem[],
+    previousItems: CartItem[],
     isOpen: boolean;
     onClose: () => void;
     setCart: (items : CartItem[])=> void;
 }
 
 
-const BakeryMenu: React.FC<BakeryMenuProps> = ({ items, isOpen, onClose, setCart }) => {
+const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose, setCart }) => {
     
     const [category, setCategory] = useState(0);
     const [selectedItem, setSelectedItem] = useState<Bread | null>(null);
@@ -40,33 +49,54 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ items, isOpen, onClose, setCart
     const handleCardClick = (bread: Bread) => {
         setSelectedItem(bread);
         setModalOpen(true);
-      };
+    };
     
-      const handleModalClose = () => {
+    const handleModalClose = () => {
         setSelectedItem(null);
         setModalOpen(false);
-      };
+    };
     
-      const handleModalConfirm = (bread: Bread, quantity: number) => {
-        console.log("CartAntes:", cartItems)
+    const handleModalConfirm = (bread: Bread, quantity: number) => {
+        const updatedData = dataCatalogoPan.map((category) => ({
+            ...category,
+            items: category.items.map((item) => 
+                item.codigoItem === bread.codigoItem
+                    ? { ...item, isSelected: true }
+                    : item
+            ),
+        }));
+        setDataCatalogoPan(updatedData);
         setCartItems((prevCartItems) => [...prevCartItems, { bread, quantity }]);
-        console.log("CartDespues:", cartItems)
         handleModalClose();
-      };
-      
-      const handleBakeryClose = () => {
-            setCart(cartItems)
-            onClose()
-      }
+    };
+    
+    const handleBakeryClose = () => {
+        var unifiedCart = cartItems
+        for (var item of previousItems) {unifiedCart.push(item)}
+        setCart(unifiedCart)
+
+        // Limpiar seleccion para cada apertura de Menu Bakery
+        const resetSelection = dataCatalogoPan.map((category) => ({
+            ...category,
+            items: category.items.map((item) => ({
+                ...item,
+                isSelected: false,
+            })),
+        }));
+        setDataCatalogoPan(resetSelection);
+
+        setCartItems([])
+        onClose()
+    }
 
     // Fetch Servicio para tener Catalogo
-    const [dataCatalogoPan, setDataCatalogoPan] = useState([]);
+    const [dataCatalogoPan, setDataCatalogoPan] = useState<Category[]>([]);
     useEffect(() => {
         const fetchData = async () => {
             try {
             // API de TEST
-            //const response = await fetch('https://catalogopan.free.beeceptor.com/todos', {
-            const response = await fetch('http://10.80.4.172:8081/scopay/webresources/catalogoPan', {
+            const response = await fetch('https://ec11055f-9910-4d14-a8ed-66882912848b.mock.pstmn.io/todos', {
+            //const response = await fetch('http://10.80.4.172:8081/scopay/webresources/catalogoPan', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'
@@ -75,8 +105,17 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ items, isOpen, onClose, setCart
             });
     
             if (response.ok) {
-                const responseData = await response.json();
-                setDataCatalogoPan(responseData.data);
+                const responseData = await response.json()
+                
+                const responseDataWithInterfaceBread =  responseData.data.map((category: Category) => ({
+                    codigo: category.codigo,
+                    descripcion : category.descripcion,
+                    items: category.items.map((item: Bread) => ({
+                        ...item,
+                        isSelected: false
+                    }))
+                }))
+                setDataCatalogoPan(responseDataWithInterfaceBread);
             } else {
                 console.error('Error en la solicitud:', response.status);
             }
@@ -88,8 +127,6 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ items, isOpen, onClose, setCart
     
         fetchData();
 
-        // Limpiar carro
-        setCartItems([])
     }, []);
 
     // Para que se dispare con el boton de App.tsx
@@ -120,24 +157,18 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ items, isOpen, onClose, setCart
                 
                 
                 <TabContext value={category.toString()} >
-                    
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems:'center', overflow:'hidden'}}>
-
                         <AppBar sx={{ position: 'relative', backgroundColor:'#ffffff' }}>
                             <Toolbar>
                                 <Box sx={{ width: '70vw' }}>
-                                    <TabList value={category} onChange={handleCategoryChange}
-                                    variant="scrollable"
-                                    scrollButtons='auto'
-                                    >
+                                    <TabList value={category} onChange={handleCategoryChange} variant="scrollable" scrollButtons='auto'>
                                         {dataCatalogoPan.map((categoryData: any) => ( 
                                             <Tab label={categoryData.descripcion} />
-
                                         ))}
                                     </TabList>
                                 </Box>
                                     <Button autoFocus color="info" onClick={handleBakeryClose} style={{ position: 'absolute', top: '20%', right: '0%'}}>
-                                    Volver al Carrito
+                                        Volver al Carrito
                                     </Button>
                             </Toolbar>
                         </AppBar>
@@ -151,9 +182,9 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ items, isOpen, onClose, setCart
                             height:'92vh',
                             marginBottom: '3vh',
                             overflow: 'hidden'
-                        }}>
+                            }}>
                         
-                                {dataCatalogoPan.map((categoryData: any) => ( 
+                            {dataCatalogoPan.map((categoryData: any) => ( 
                                 <TabPanel value={category} index={categoryData.codigo-1} >
                                 <Box 
                                     className = 'container'
@@ -169,33 +200,24 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ items, isOpen, onClose, setCart
                                     display: category === (categoryData.codigo-1) ? 'flex' : 'none', 
                                     overflow:'auto',
                                     justifyContent: 'space-around'
-                                }}
+                                    }}
                                 >
                                     <Grid container>
                                     {categoryData.items.map((item: any) => ( item.disponible == "false" ? null : (
                                         <Grid item xs={2.4}>
-                                            <BreadCard bread={item} seleccionado={true} onClick={handleCardClick} />
+                                            <BreadCard bread={item} isSelected={item.isSelected} onClick={handleCardClick} />
                                         </Grid>
                                     )
                                     ))}
                                     </Grid>
-                                </Box>
-                                
+                                </Box>   
                                 </TabPanel>
                             ))}
-
                         </Box>
-
                     </Box>
                 </TabContext>    
-                
             </Dialog>
-            <QuantityModal
-                item={selectedItem}
-                open={modalOpen}
-                onClose={handleModalClose}
-                onConfirm={handleModalConfirm}
-             />
+            <QuantityModal item={selectedItem} open={modalOpen} onClose={handleModalClose} onConfirm={handleModalConfirm} />
         </>                                
         );
 

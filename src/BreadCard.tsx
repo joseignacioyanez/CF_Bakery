@@ -5,41 +5,54 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 interface Bread {
     disponible: boolean;
-    codigo: string;
+    codigoItem: string;
     nombre: string;
     url: string;
     precioAfiliado?: number;
     precioNoAfiliado?: number;
+    isSelected: boolean;
 }
 
 interface BreadCardProps {
     bread : Bread;
-    seleccionado : boolean;
+    isSelected: boolean;
     onClick : (bread : Bread) => void;
 }
 
+// Porque nombres de panes venian con formato incorrecto, cambiar a solo MAYUSminus cuando se actualice API
 function correctFormat(input: string): string {
-    // Replace special characters and capitalize words
     const corrected = input
-        .replace(/[^A-Za-záéíóúüÁÉÍÓÚÜñÑ\s]/g, "") // Remove non-alphabetic characters except spaces
-        .replace(/\w+/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()); // Capitalize words
-    
+        .replace(/[^A-Za-záéíóúüÁÉÍÓÚÜñÑ\s]/g, "") 
+        .replace(/\w+/g, (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase());
     return corrected;
 }
 
-export const BreadCard:FC<BreadCardProps> = ({bread, onClick})  => {
+export const BreadCard:FC<BreadCardProps> = ({bread, isSelected, onClick})  => {
+
+    const selectedCardStyle = {
+        margin: '8px',
+        height: '39vh',
+        width: 'auto',
+        display: 'flex',
+        flexDirection:'column',
+        justifyContent: 'space-between',
+        border: '3px solid green'
+    }
+
+    const unselectedCardStyle = {
+        margin: '8px',
+        height: '39vh',
+        width: 'auto',
+        display: 'flex',
+        flexDirection:'column',
+        justifyContent: 'space-between',
+    }
+
 
     return <>
             <Card
-            key={bread.codigo}
-            sx={{
-                margin: '8px',
-                height: '39vh',
-                width: 'auto',
-                display: 'flex',
-                flexDirection:'column',
-                justifyContent: 'space-between',
-            }}>
+            key={bread.codigoItem}
+            sx={isSelected ? selectedCardStyle : unselectedCardStyle}>
                 <CardMedia 
                     component="img" alt={correctFormat(bread.nombre)} 
                     sx={{ 

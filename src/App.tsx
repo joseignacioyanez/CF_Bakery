@@ -4,13 +4,15 @@ import BakeryMenu from './BakeryMenu';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'// Revisar
 
+// Clases para enviar y recibir items para el carrito
 interface Bread {
   disponible: boolean;
-  codigo: string;
+  codigoItem: string;
   nombre: string;
   url: string;
   precioAfiliado?: number;
   precioNoAfiliado?: number;
+  isSelected: boolean;
 }
 
 interface CartItem{
@@ -39,7 +41,6 @@ const App : React.FC<AppProps> = () =>{
     setCart([]);
   }
 
-  // Style
   const styleBoton ={
     position: 'absolute',
     top: '50%',
@@ -63,7 +64,8 @@ const App : React.FC<AppProps> = () =>{
       <pre>
       {JSON.stringify(cart, undefined, 2)}
       </pre>
-      <BakeryMenu items={cart} isOpen={bakeryOpen} onClose={closeBakery} setCart={setCart} />
+
+      <BakeryMenu previousItems={cart} isOpen={bakeryOpen} onClose={closeBakery} setCart={setCart} />
     </div>
   );
 }
