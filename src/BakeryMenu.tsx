@@ -260,7 +260,7 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose,
                                             }, 0) || 1;
 
                                             {/* Repetir panes varias veces para probar muchas Cards */}
-                                            const repeatTimes = 1;
+                                            const repeatTimes = 3;
 
                                             return (
                                                 Array.from({ length: repeatTimes }).map((_, index) => (

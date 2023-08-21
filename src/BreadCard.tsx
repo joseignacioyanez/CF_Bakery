@@ -35,7 +35,8 @@ export const BreadCard:FC<BreadCardProps> = ({bread, isSelected, onClick, quanti
 
     const selectedCardStyle = {
         margin: '4px',
-        height: '21vh',
+        padding: '0px !important',
+        height: '28vh',
         width: 'auto',
         display: 'flex',
         flexDirection:'column',
@@ -48,7 +49,7 @@ export const BreadCard:FC<BreadCardProps> = ({bread, isSelected, onClick, quanti
     const unselectedCardStyle = {
         margin: '4px',
         padding: '0px !important',
-        height: '21vh',
+        height: '28vh',
         width: 'auto',
         display: 'flex',
         flexDirection:'column',
@@ -63,38 +64,62 @@ export const BreadCard:FC<BreadCardProps> = ({bread, isSelected, onClick, quanti
                 <CardMedia 
                     component="img" alt={correctFormat(bread.nombre)} 
                     sx={{ 
-                        height: '12vh',
+                        height: '15vh',
                         padding: '0px !important',
                     }}
                     image={bread.url.replace('linuxlocal', '10.80.4.172')} />
                 
                 <CardContent
                 sx={{
-                    height:'19vh',
+                    height:'13vh',
                     display: 'flex',
                     flexDirection:'column',
                     justifyContent: 'space-evenly',
                     alignItems:'center',
                     padding: '0px !important',
                 }}>
-                    <Typography variant='body2' component="div" sx={{fontSize:'0.95rem', textAlign:'center', maxHeight:'5vh', overflow:'hidden', }} >
+                    <Typography variant='body2' component="div" sx={{fontSize:'1rem', textAlign:'center', maxHeight:'7vh', overflow:'hidden', }} >
                         {correctFormat(bread.nombre)}
                     </Typography>
 
-                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'0.9rem'}}>
+                    
                         {/*Si se ha seleccionado el producto, mostrar precio total en lugar de unitario*/}
-                        {isAffiliated ? 
-                                isSelected ? 
-                                    bread.precioAfiliado != null ? formatPrice(bread.precioAfiliado * quantity) : 'Cant: ' + quantity + ' Tot: $'+ formatPrice(0.10*quantity)
+                        {/* En desarrollo, no tenog los precios por lo que valido si es null, despues simplificar */}
+                        {isSelected ? 
+                            isAffiliated ?  /* Afiliado - Seleccionado */
+                                bread.precioAfiliado != null ?
+                                    <>
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'Cantidad: ' + quantity}</Typography>
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'Total: $'+ formatPrice(bread.precioAfiliado*quantity)}</Typography>
+                                    </>
                                 :
-                                    bread.precioAfiliado != null ? formatPrice(bread.precioAfiliado) : '$'+ '0.10' + ' c/u'
-                            ://No Afiliado
-                                isSelected ? 
-                                    bread.precioNoAfiliado != null ? formatPrice(bread.precioNoAfiliado * quantity) : 'Cant: ' + quantity + 'Tot: $'+ formatPrice(0.10 * quantity)
+                                    <>
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'Cantidad: ' + quantity}</Typography>
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'Total: $'+ formatPrice(0.10*quantity)}</Typography>
+                                    </>
+                            :
+                                bread.precioNoAfiliado != null ? /* No Afiliado - Seleccionado */
+                                    <>
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'Cantidad: ' + quantity}</Typography>
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'Total: $'+ formatPrice(bread.precioNoAfiliado*quantity)}</Typography>
+                                    </>
                                 :
-                                    bread.precioNoAfiliado != null ? formatPrice(bread.precioNoAfiliado) : '$'+ '0.10' + ' c/u'
-                        }    
-                    </Typography>
+                                    <>
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'Cantidad: ' + quantity}</Typography>
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'Total: $'+ formatPrice(0.10*quantity)}</Typography>
+                                    </>
+                        :
+                            isAffiliated ? /* Afiliado - No Seleccionado */
+                                bread.precioAfiliado != null ?
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'$ ' + formatPrice(bread.precioAfiliado) + 'c/u'}</Typography>
+                                :
+                                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'$ ' + formatPrice(0.10) + 'c/u'}</Typography>
+                            :
+                                bread.precioNoAfiliado != null ? /* No Afiliado - No Seleccionado */
+                                <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'$ ' + formatPrice(bread.precioNoAfiliado) + 'c/u'}</Typography>
+                                :
+                                <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'1rem'}}>{'$ ' + formatPrice(0.10) + 'c/u'}</Typography>     
+                        }  
                 </CardContent>
             </Card>
 </div>
