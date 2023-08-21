@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal } from '@mui/material';
+import React, { useState } from 'react';
+import { Button } from '@mui/material';
 import BakeryMenu from './BakeryMenu'; 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'// Revisar
@@ -62,6 +62,7 @@ const App : React.FC<AppProps> = () =>{
         Limpiar Carro
       </Button>
 
+      {/*Mostrar contenido de Carrito*/}
       <pre>
       {JSON.stringify(cart, undefined, 2)}
       </pre>

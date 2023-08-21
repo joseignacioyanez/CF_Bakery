@@ -1,10 +1,10 @@
 import { BreadCard } from './BreadCard';
 import React,  { useEffect, useState } from 'react';
-import { Dialog, Toolbar, AppBar, Button, Grid, Tab, Box}  from '@mui/material';
-import { TabContext, TabList } from '@mui/lab';
+import { Dialog, Toolbar, AppBar, Button, Grid, Tab, Box, Tabs, IconButton}  from '@mui/material';
+import { TabContext } from '@mui/lab';
 import QuantityModal from './QuantityModal';
-
-
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface Bread {
     disponible: string;
@@ -34,6 +34,7 @@ interface BakeryMenuProps {
     onClose: () => void;
     setCart: (items : CartItem[])=> void;
 }
+
 
 
 const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose, setCart, isAffiliated }) => {
@@ -160,26 +161,64 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose,
                 
                 <TabContext value={category.toString()} >
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems:'center', overflow:'hidden'}}>
-                        <AppBar sx={{ position: 'relative', backgroundColor:'#ffffff' }}>
+                        <AppBar sx={{ backgroundColor:'#eee'}}>
                             <Toolbar>
                                 <Box sx={{ width: '70vw' }}>
-                                    <TabList value={category} onChange={handleCategoryChange} variant="scrollable" scrollButtons='auto'>
-                                    {dataCatalogoPan.map((categoryData: Category) => {
-                                    const hasEnabledBread = categoryData.items.some((bread) => bread.disponible != 'false' ? true : false);
-                                    console.log(categoryData)
-                                    console.log("cat: " + categoryData.descripcion + " dispo: " + hasEnabledBread)
-                                    return hasEnabledBread ? (
-                                        <Tab label={categoryData.descripcion} key={categoryData.codigo} />
-                                    ) : null;
-                                    })}
-                                    </TabList>
+                                    <Tabs 
+                                    value={category} 
+                                    onChange={handleCategoryChange} 
+                                    /*Para cambiar botones de Scroll Tabs*/
+                                    ScrollButtonComponent={(props) => {
+                                        if (
+                                            props.direction === "left"                                         ) {
+                                            return (
+                                                <IconButton {...props}>
+                                                    <ArrowBackIosIcon
+                                                        sx={{
+                                                            marginLeft: "7px",
+                                                            fontSize:'2rem',
+                                                            color:"#888"
+                                                        }}
+                                                    />
+                                                </IconButton>
+                                            );
+                                        } else if (
+                                            props.direction === "right"                                         ) {
+                                            return (
+                                                <IconButton {...props}>
+                                                    <ArrowForwardIosIcon
+                                                        sx={{
+                                                            marginLeft: "7px",
+                                                            fontSize:'2rem',
+                                                            color:"#888"
+                                                        }}
+                                                    />
+                                                </IconButton>
+                                            );
+                                        } else {
+                                            return null;
+                                        }
+                                    }}
+                                    variant="scrollable" 
+                                    scrollButtons={true}
+                                    allowScrollButtonsMobile>
+                                        {/*Verifica si la Categoria cuenta con por lo menos 1 pan habilitado*/}
+                                        {dataCatalogoPan.map((categoryData: Category) => {
+                                        const hasEnabledBread = categoryData.items.some((bread) => bread.disponible != 'false' ? true : false);
+                                        return hasEnabledBread ? (
+                                            <Tab label={categoryData.descripcion} key={categoryData.codigo} />
+                                        ) : null;
+                                        })}
+
+                                    </Tabs>
                                 </Box>
-                                    <Button autoFocus color="info" onClick={handleBakeryClose} style={{ position: 'absolute', top: '20%', right: '0%'}}>
+                                    <Button autoFocus variant={'contained'} color="info" onClick={handleBakeryClose} style={{ position: 'absolute', top: '20%', right: '1%', backgroundColor:'green'}}>
                                         Volver al Carrito
                                     </Button>
                             </Toolbar>
                         </AppBar>
 
+                        {/* Contenedor de Paneles */}
                         <Box 
                         sx={{ 
                             
@@ -190,7 +229,7 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose,
                             marginBottom: '3vh',
                             overflow: 'hidden'
                             }}>
-                        
+                            {/* Por cada Categoria colocar Panel y Grid */}
                             {dataCatalogoPan.map((categoryData: any) => ( 
                                 <TabPanel value={category} index={categoryData.codigo-1} >
                                 <Box 
@@ -199,28 +238,45 @@ const BakeryMenu: React.FC<BakeryMenuProps> = ({ previousItems, isOpen, onClose,
                                     typography: 'body1', 
                                     width: '100vw',
                                     height: '90vh', 
-                                    backgroundColor: 'rgba(230, 230, 230, 1)', 
+                                    backgroundColor: 'rgba(220, 220, 220, 1)', 
                                     borderRadius: '20px', 
-                                    padding: '10px', 
+                                    padding: '7px', 
                                     margin: '10px',
                                     boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', 
-                                    overflow:'hidden'
+                                    overflow:'scroll'
                                     }}
                                 >
                                     <Grid container>
-                                    {categoryData.items.map((item: any) => ( item.disponible == "false" ? null : (
-                                        <Grid item xs={1.5}>
-                                            <BreadCard bread={item} isSelected={item.isSelected} onClick={handleCardClick} quantity={
-                                                                                                                                        cartItems.reduce((accumulator, cartItem) => {
-                                                                                                                                        if (cartItem.bread.codigoItem === item.codigoItem) {
-                                                                                                                                            return accumulator + (cartItem.quantity ?? 0);
-                                                                                                                                        }
-                                                                                                                                        return accumulator;
-                                                                                                                                        }, 0) || 1
-                                                                                                                                    } isAffiliated={isAffiliated}/>
-                                        </Grid>
-                                    )
-                                    ))}
+                                    {categoryData.items.map((item: any) => {
+                                        if (item.disponible === "false") {
+                                            return null;
+                                        } else {
+                                            {/* Acumular items de Carrito para mostrar valor acumulado de mismos panes ya ingresados */}
+                                            const aggregatedQuantity = cartItems.reduce((accumulator, cartItem) => {
+                                                if (cartItem.bread.codigoItem === item.codigoItem) {
+                                                    return accumulator + (cartItem.quantity ?? 0);
+                                                }
+                                                return accumulator;
+                                            }, 0) || 1;
+
+                                            {/* Repetir panes varias veces para probar muchas Cards */}
+                                            const repeatTimes = 1;
+
+                                            return (
+                                                Array.from({ length: repeatTimes }).map((_, index) => (
+                                                    <Grid item xs={1.5} key={index}>
+                                                        <BreadCard
+                                                            bread={item}
+                                                            isSelected={item.isSelected}
+                                                            onClick={(clickedBread) => handleCardClick(clickedBread)}
+                                                            quantity={Math.floor(aggregatedQuantity / repeatTimes)} 
+                                                            isAffiliated={isAffiliated}
+                                                        />
+                                                    </Grid>
+                                                ))
+                                            );
+                                        }
+                                    })}
                                     </Grid>
                                 </Box>   
                                 </TabPanel>

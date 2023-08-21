@@ -1,7 +1,5 @@
-import { Card, CardContent, CardMedia, Typography, Button } from "@mui/material";
-import React, { FC } from "react";
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-
+import { Card, CardContent, CardMedia, Typography  } from "@mui/material";
+import { FC } from "react";
 
 interface Bread {
     disponible: string;
@@ -36,8 +34,8 @@ const formatPrice = (number: number) => {
 export const BreadCard:FC<BreadCardProps> = ({bread, isSelected, onClick, quantity, isAffiliated})  => {
 
     const selectedCardStyle = {
-        margin: '8px',
-        height: '29vh',
+        margin: '4px',
+        height: '21vh',
         width: 'auto',
         display: 'flex',
         flexDirection:'column',
@@ -48,8 +46,9 @@ export const BreadCard:FC<BreadCardProps> = ({bread, isSelected, onClick, quanti
     }
 
     const unselectedCardStyle = {
-        margin: '8px',
-        height: '22vh',
+        margin: '4px',
+        padding: '0px !important',
+        height: '21vh',
         width: 'auto',
         display: 'flex',
         flexDirection:'column',
@@ -57,49 +56,46 @@ export const BreadCard:FC<BreadCardProps> = ({bread, isSelected, onClick, quanti
     }
 
 
-    return <>
+    return <div onClick={() => onClick(bread)} style={{ cursor: 'pointer' }}>
             <Card
             key={bread.codigoItem}
             sx={isSelected ? selectedCardStyle : unselectedCardStyle}>
                 <CardMedia 
                     component="img" alt={correctFormat(bread.nombre)} 
                     sx={{ 
-                        height: '10vh',
+                        height: '12vh',
+                        padding: '0px !important',
                     }}
                     image={bread.url.replace('linuxlocal', '10.80.4.172')} />
                 
                 <CardContent
                 sx={{
+                    height:'19vh',
                     display: 'flex',
                     flexDirection:'column',
-                    justifyContent: 'space-between',
-                    textAlign:'center',
+                    justifyContent: 'space-evenly',
                     alignItems:'center',
+                    padding: '0px !important',
                 }}>
-                    <div style={{height:'4vh'}}>
-                        <Typography variant="h6" component="div" >
-                            {correctFormat(bread.nombre)}
-                        </Typography>
-                    </div>
-                    <div style={{height:'4vh', display:'flex',  justifyContent:'space-between', flexDirection:'row', marginTop:'0.5vh'}}>
-                        <Typography  variant="h6" component="div" color="text.secondary" sx={{width:'100%', fontSize:'1.3rem', marginRight:'2vw', flex:1}}>
-                            {/*Si se ha seleccionado el producto, mostrar precio total en lugar de unitario*/}
-                            {isAffiliated ? 
-                                    isSelected ? 
-                                        bread.precioAfiliado != null ? formatPrice(bread.precioAfiliado * quantity) : 'Tot: $'+ formatPrice(0.10*quantity)
-                                    :
-                                        bread.precioAfiliado != null ? formatPrice(bread.precioAfiliado) : '$'+ '0.10' + ' c/u'
-                                ://No Afiliado
-                                    isSelected ? 
-                                        bread.precioNoAfiliado != null ? formatPrice(bread.precioNoAfiliado * quantity) : 'Tot: $'+ formatPrice(0.10 * quantity)
-                                    :
-                                        bread.precioNoAfiliado != null ? formatPrice(bread.precioNoAfiliado) : '$'+ '0.10' + ' c/u'
-                            }    
-                        </Typography>
-                        <Button onClick={() => onClick(bread)} variant='contained' color="success" style={{ height:'5vh', width:'5vh', minWidth:'auto', justifySelf:'flex-end'}}>< AddShoppingCartIcon sx={{fontSize:30}}/></Button>
+                    <Typography variant='body2' component="div" sx={{fontSize:'0.95rem', textAlign:'center', maxHeight:'5vh', overflow:'hidden', }} >
+                        {correctFormat(bread.nombre)}
+                    </Typography>
 
-                    </div>
+                    <Typography  variant="body2" component="div" color="text.secondary" sx={{fontSize:'0.9rem'}}>
+                        {/*Si se ha seleccionado el producto, mostrar precio total en lugar de unitario*/}
+                        {isAffiliated ? 
+                                isSelected ? 
+                                    bread.precioAfiliado != null ? formatPrice(bread.precioAfiliado * quantity) : 'Cant: ' + quantity + ' Tot: $'+ formatPrice(0.10*quantity)
+                                :
+                                    bread.precioAfiliado != null ? formatPrice(bread.precioAfiliado) : '$'+ '0.10' + ' c/u'
+                            ://No Afiliado
+                                isSelected ? 
+                                    bread.precioNoAfiliado != null ? formatPrice(bread.precioNoAfiliado * quantity) : 'Cant: ' + quantity + 'Tot: $'+ formatPrice(0.10 * quantity)
+                                :
+                                    bread.precioNoAfiliado != null ? formatPrice(bread.precioNoAfiliado) : '$'+ '0.10' + ' c/u'
+                        }    
+                    </Typography>
                 </CardContent>
             </Card>
-</>
+</div>
 }
